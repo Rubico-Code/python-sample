@@ -1,0 +1,92 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./docker/local/Dockerfile
+    image: rubico_app
+    container_name: rubico_app
+    volumes:
+      - ./src:/app:z
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./.envs/.env.local
+    depends_on:
+      - mysql
+      - mailpit
+      - redis
+    
+  mysql:
+    image: mysql:8
+    container_name: rubico_mysql
+    env_file:
+      - ./.envs/.env.local
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_HOST=%
+    volumes:
+      - rubico_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${MYSQL_USER}", "-p${MYSQL_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+
+  celery:
+    image: rubico_app
+    container_name: rubico_celery_container
+    command: celery -A a_core worker -E -l info
+    volumes:
+      - ./src:/app:z
+    env_file:
+      - ./.envs/.env.local
+    depends_on:
+      - postgres
+      - redis
+      - app
+ 
+  beat:
+    image: rubico_app
+    container_name: rubico_app_container
+    command: celery -A a_core beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    volumes:
+      - ./src:/app:z
+    env_file:
+      - ./.envs/.env.local
+    depends_on:
+      - redis
+      - app
+  
+  flower:
+    image: mher/flower
+    container_name: rubico_flower
+    ports:
+      - "5555:5555"
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+
+  mailpit:
+    image: docker.io/axllent/mailpit:v1.15
+    container_name: rubico_mailpit
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    volumes:
+      - mailpit_data:/data
+
+  redis:
+    image: redis:6
+    container_name: rubico_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  rubico_mysql_data:
+  mailpit_data:
+  redis_data:

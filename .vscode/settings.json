@@ -1,0 +1,41 @@
+{
+  "type": "setting",
+  "settings": {
+      "python.formatting.provider": "none",
+      "editor.formatOnSave": true,
+      "editor.codeActionsOnSave": {
+          "source.fixAll": true,
+          "source.organizeImports": true
+      },
+      "files.exclude": {
+          "**/__pycache__": true,
+          "**/.pytest_cache": true,
+          "**/.mypy_cache": true,
+          "**/.ruff_cache": true
+      },
+      "[python]": {
+          "editor.defaultFormatter": "charliermarsh.ruff",
+          "editor.formatOnSave": true,
+          "editor.formatOnType": true,
+          "editor.rulers": [90],
+          "editor.tabSize": 4
+      },
+      "ruff.format.args": ["--config=pyproject.toml"],
+      "ruff.lint.args": ["--config=pyproject.toml"],
+      "ruff.organizeImports": true,
+      "ruff.fixAll": true,
+      "ruff.lint.run": "onSave",
+      "ruff.importStrategy": "fromEnvironment",
+      "python.analysis.typeCheckingMode": "basic",
+      "python.analysis.autoImportCompletions": true,
+      "files.watcherExclude": {
+          "**/.git/objects/**": true,
+          "**/.git/subtree-cache/**": true,
+          "**/node_modules/**": true,
+          "**/.hg/store/**": true,
+          "**/.venv/**": true,
+          "**/.mypy_cache/**": true,
+          "**/.ruff_cache/**": true
+      }
+  }
+}
