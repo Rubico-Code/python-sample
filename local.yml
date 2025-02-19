@@ -37,25 +37,26 @@ services:
   celery:
     image: rubico_app
     container_name: rubico_celery_container
-    command: celery -A a_core worker -E -l info
+    command: celery -A config.celery_app worker -l INFO
     volumes:
       - ./src:/app:z
     env_file:
       - ./.envs/.env.local
     depends_on:
-      - postgres
+      - mysql
       - redis
       - app
  
   beat:
     image: rubico_app
     container_name: rubico_app_container
-    command: celery -A a_core beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    command: celery -A config.celery_app  -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
     volumes:
       - ./src:/app:z
     env_file:
       - ./.envs/.env.local
     depends_on:
+      - mysql
       - redis
       - app
   
